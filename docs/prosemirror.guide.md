@@ -697,9 +697,7 @@ ProseMirror [编辑器视图](https://prosemirror.net/docs/ref/#view.EditorView)
 
 因此，编辑器视图显示给定的编辑器状态，当发生某些事情时，它会创建一个事务并广播它。然后，通常使用此事务创建一个新状态，并使用其 [updateState](https://prosemirror.net/docs/ref/#view.EditorView.updateState) 方法将其提供给视图。
 
-```
-DOM event ↗↘  EditorView Transaction ↖↙ new EditorState
-```
+![data flow](data-flow.png)
 
 这创建了一个直接的、循环的数据流，而不是（在 JavaScript 世界中）经典的命令式事件处理程序宿主方法，后者往往会创建一个更复杂的数据流网络。
 

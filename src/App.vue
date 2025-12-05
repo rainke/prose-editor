@@ -1,5 +1,5 @@
 <script setup>
-import ProseMirrorEditor from './components/ProseMirrorEditor.vue'
+import ProseMirrorEditor from './ProseEditor/ProseEditor.vue'
 </script>
 
 <template>

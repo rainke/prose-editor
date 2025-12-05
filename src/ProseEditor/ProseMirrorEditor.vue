@@ -1,7 +1,9 @@
 <script setup>
 import { onMounted, ref, useTemplateRef, onBeforeUnmount } from 'vue'
 import 'prosemirror-menu/style/menu.css'
-import { createEditor } from '../ProseEditor'
+import { createEditor } from '.'
+import { defaultMarkdownSerializer } from "prosemirror-markdown"
+import { useInjectEditorContext } from './useEditorState'
 
 // 编辑器容器引用
 const editorRef = useTemplateRef('editor')
@@ -9,12 +11,11 @@ const editorRef = useTemplateRef('editor')
 /** @type { import('prosemirror-view').EditorView } */
 let view = null
 
+const ctx = useInjectEditorContext()
 
-onMounted(() => {
-  try {
+const markdown = `你好
 
-    view = createEditor(editorRef.value,
-`# Welcome to ProseMirror!
+# Welcome to ProseMirror!
 
 This is a **powerful** rich text editor *framework*.
 
@@ -27,10 +28,33 @@ Try the following operations:
 - Type \`#\` + space - Create heading
 - Type \`*\` or \`-\` + space - Create list
 Open the browser console to see document change logs 📋
-`)
-  } catch (error) {
-    console.error('Failed to initialize ProseMirror Editor:', error)
-  }
+
+## katex support
+
+You can also write inline math like this: $E=mc^2$, or display math:
+
+$$
+\\int_a^b f(x)dx = F(b) - F(a)
+$$
+
+## code blocks with syntax highlighting:
+\`\`\`javascript
+function greet(name) {
+  console.log('Hello, ' + name + '!')
+}
+greet('ProseMirror')
+\`\`\`
+`
+onMounted(() => {
+  view = createEditor(editorRef.value,
+    {
+      markdown: markdown,
+      onStateChange: (newState) => {
+        ctx.updateState(newState)
+      }
+
+    })
+  ctx.setView(view)
   console.log('ProseMirror Editor initialized:', view)
 })
 
@@ -40,12 +64,20 @@ onBeforeUnmount(() => {
     view.destroy()
   }
 })
+
+function getMarkdown() {
+  if (view) {
+    const doc = view.state.doc
+    const markdown = defaultMarkdownSerializer.serialize(doc)
+    console.log('Current Markdown Content:\n', markdown)
+  }
+}
 </script>
 
 <template>
   <div class="editor-wrapper">
     <div ref="editor" class="editor"></div>
-    
+    <div><button @click="getMarkdown"> log markdown</button></div>
     <div class="tips">
       <h3>💡 核心概念</h3>
       <div class="concept-grid">
